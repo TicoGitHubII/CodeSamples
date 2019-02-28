@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Bootstrap 101 Template</title>
+    <!-- Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <h1>Music Key ColorXistic</h1>
+    <div class="form-container">
+        <div class="col-md-3 " id="keyContainer">
+            <form>
+                <div class="form-group">
+                    <label for="key">Key</label>
+                    <input type="text" class="form-control" id="key" placeholder="Key">
+                </div>
+                <div class="form-group">
+                    <label for="ChrXtic">Charatersitic</label>
+                    <input type="text" class="form-control" id="ChrXtic" placeholder="Charatersitic">
+                </div>
+                <div class="form-group">
+                    <label for="color">Color</label>
+                    <input type="text" class="form-control" id="color" placeholder="Color">
+                </div>
+                <div class="form-group">
+                    <label for="waveLn">Wavelength</label>
+                    <input type="number" class="form-control" id="waveLn" placeholder="WaveLength">
+                </div>
+                <div class="form-group hidden">
+                    <label for="id">Id</label>
+                    <div><span id="id"></span></div>
+                </div>
+                
+                <button id="getKey" type="button" class="btn btn-success">Get</button>
+                <button id="addKey" type="button" class="btn btn-primary">Add</button>
+                <button id="deleteSet" type="button" class="btn btn-secondary">Delete</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="listing"></div>
+
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="http://sabioapi2.azurewebsites.net/scripts/js"></script>
+
+    <script type="text/javascript">
+
+        /* steps 1. Build a form , to post my choice,-- Music Coloring  3 props
+        Property : key , color = color, Charatersitic =ChrXtic wavelength =WvLgth
+        additon  In/Out, set/get read/write toDom/toDb xyz abc  ,  key 
+        musicColor
+        resolves errors 
+        2. list all created with post calls , do not display id  for current entity, use api , delete button
+        3. update using click or updating edit , pre populate , use a get by Id with endpoint 
+        4. Create  a  button near submit button udates the information of the current enity in edit mode
+        5. make a delete button database and DOM 
+        */
+
+        page.startUp = () => {
+            $.ajaxSetup({
+                headers: { 'SABIO-AUTH': 'UDS7XNFRN' }
+            });
+
+
+            $('#getKey').on('click', page.handlers.getKeyData)
+            $('#addKey').on('click', page.handlers.submitKey)
+            $('#listing').on('click', '.delete', page.handlers.deleteKey)
+            $('#listing').on('click', '.edit', page.handlers.getKeyByEdit)
+        }
+
+        /////////////////////////////// handlers///////////////////////////
+
+
+
+        page.handlers.getKeyData = () => {
+            page.getKey();
+        }
+
+        page.handlers.submitKey = () => {
+            const musicData = page.readForm();
+            if(page.currrentId){
+                musicData.id === page.currentId;
+                page.updateKey(musicData);
+            }else {        
+                page.addKey(musicData);
+            }
+            $("form").trigger('reset');
+        }
+
+        page.handlers.deleteKey = function () {
+
+            page.currentId = $(this).closest(".musicKey").prop('id');
+            page.deleteKey(page.currentId);
+        }
+
+        page.handlers.getKeyByEdit = function(){             
+            page.currentKeyId = $(this).closest(".musicKey").prop('id')
+            page.getKeyById( page.currentKeyId);
+
+        }
+
+        ////////////////////////////////// ajax main /////////////////////////////
+        page.addKey = (payload) => {
+            let url = "http://sabioapi2.azurewebsites.net/api/entities/musicKeyColors";
+            const settings = {
+
+                data: payload,
+                success: page.onAddKeySuccess,
+                error: page.onError,
+                type: "POST",
+            };
+            $.ajax(url, settings);
+
+        }
+
+        page.getKey = () => {
+            let url = "http://sabioapi2.azurewebsites.net/api/entities/musicKeyColors";
+            const settings = {
+
+                success: page.onKeySuccess,
+                error: page.onError,
+                type: "GET",
+            };
+            $.ajax(url, settings);
+        }
+        /////////////////////////  AJAX subs ///////////////////////////
+        page.getKeyById = (id) => {
+            let url = "http://sabioapi2.azurewebsites.net/api/entities/musicKeyColors/" + id;
+            const settings = {
+
+                success: page.onGetKeySuccess,
+                error: page.onError,
+                type: "GET",
+            };
+            $.ajax(url, settings);
+        }
+
+        page.deleteKey = (id) => {
+            let url = "http://sabioapi2.azurewebsites.net/api/entities/musicKeyColors/" + id;
+            const settings = {
+                cache: false,
+                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                dataType: 'json',
+                success: page.onKeyDeleteSuccess,
+                error: page.onError,
+                type: "DELETE",
+            };
+            $.ajax(url, settings);
+        }
+
+        page.updateKey = (payload) => {
+            let url = "http://sabioapi2.azurewebsites.net/api/entities/musicKeyColors" + payload.id;
+            const settings = {
+
+                data: payload,
+                success: page.onUpdateKeySuccess,
+                error: page.onError,
+                type: "PUT",
+            };
+            $.ajax(url, settings);
+        }
+
+
+        //////////////////////////////// call back functions ///////////////////
+
+
+        page.onKeySuccess = (response, textStatus, xhr) => {
+
+            for (let i = 0; i < response.items.length; i++) {
+                let template = $($('#template').html());  // Get html in jQ obj
+
+                template.find('.keyLog').text(response.items[i].key);
+                template.find('.chrXticLog').text(response.items[i].charateristic);
+                template.find('.colorLog').text(response.items[i].color);
+                template.find('.waveLnLog').text(response.items[i].wavelength);
+                template.prop('id', response.items[i].id) // addition for deletion
+
+                $('#listing').append(template);
+            }
+        }
+
+        ////////////////// Ajax Addition Simple  Callbacks  /////////////////////////
+        page.onAddKeySuccess = (response) => {
+            console.log("Post", response);
+
+
+        }
+        page.onUpdateKeySuccess = (response) => {
+            console.log("Update Key", response);
+        }
+
+        page.onKeyDeleteSuccess = (response) => {
+            console.log("Delete Key", response);
+            $('#' + page.currentId).remove();
+        }
+
+        page.onGetKeySuccess = (response) => {
+            console.log("Get By Id", response);
+
+                $('#key').val(response.item.key);
+                $('#ChrXtic').val(response.item.charateristic);
+                $('#color').val(response.item.color);
+                $('#waveLn').val(response.item.wavelength);
+        }
+
+        page.onError = (xhr, textStatus, error) => {
+            console.log("Ajax Failed");
+        }
+
+
+        ///////////////////////////////////// misc. ///////////////////////////
+        page.readForm = () => {
+            return {
+                key: $('#key').val(),
+                charateristic: $('#ChrXtic').val(),
+                color: $('#color').val(),
+                wavelength: $('#waveLn').val(),
+            }
+        }
+
+
+    </script>
+
+    <script id="template" type="text/html">
+       <div class="form-group musicKey col-md-4">
+           <div class="keyLog"></div>
+           <div class="chrXticLog"></div>
+           <div class="colorLog"></div>
+           <div class="waveLnLog"><span>Hz</span></div>
+           <button class="edit btn btn-primary">Edit</button>
+           <button class="delete btn btn-danger">Delete</button>
+        </div>
+    
+    </script>
+</body>
+
+</html>

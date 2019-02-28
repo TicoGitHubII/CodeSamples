@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+
+</head>
+
+<body class="template-page sidebar-collapse">
+
+    <!-- Navbar -->
+
+
+    <div class="wrapper">
+        <div class="container">
+            <div class="assess-template col-sm-12">
+
+
+
+
+                <div class="container">
+                    <br />
+                    <div class="row">
+                        <hr />
+                        <div class="container">
+
+                            <h3>Array A Top 5</h3>
+                            <ul id="result" class="list-unstyled"></ul>
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <!--Footer-->
+    <footer class="footer">
+
+    </footer>
+
+    </div>
+
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://-checkin.azurewebsites.net/Scripts/.js"></script>
+
+
+    <!-- All your code goes below here-->
+    <script type="text/javascript">
+        page.startUp = function () {
+            console.log(' go'); // firing
+            .page.handlers.getTopSongs();
+        };
+
+        // Handlers   
+        page.handlers.getTopSongs = function () {
+
+            //read 
+            let value = utilities.readSong();
+            // calculate  song 
+            let param = utilities.displaySong(value);
+
+        }
+
+
+        // UTILITES 
+        // read Obj 
+        utilities.readSong = function () {
+            let artist = ["Balmorhea", "6lack", "Daniel Ceasar", "Prince", "Khali"];
+            return artist;
+        };
+
+        utilities.displaySong = function (obj) {
+            // calculate  song 
+            let arr = ["#1", "#2", "#3", "#4", "#5"];
+            for (let i = 0; i < obj.length; i++) {
+
+                $('#result').append("<li> <span class =\"title\"> My " + arr[i]
+                    + " Band is </span> " + obj[i] + '</li>');
+            };
+
+            for (let i = 0; i < obj.length; i++) {
+
+                $('#result').append("<li> <span class =\"title\"> My " + (i + 1)
+                    + "st favorite band is </span> " + obj[i] + '</li>');
+            };
+
+
+        };
+
+
+    </script>
+
+
+
+</body>
+
+</html>
